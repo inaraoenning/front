@@ -52,7 +52,7 @@ import { RpgService } from '../../core/services/rpg.service';
       <!-- Seção de Personagens -->
       <div class="card bg-base-100 shadow-xl border border-secondary/20">
         <div class="card-body p-4 md:p-6 flex flex-col h-full">
-          <h2 class="card-title text-secondary mb-2">👥 Heróis Disponíveis</h2>
+          <h2 class="card-title text-tertiary mb-2">👥 Heróis Disponíveis</h2>
           
           <div class="flex-1 overflow-y-auto pr-2 flex flex-col gap-3 min-h-[250px] max-h-[350px]">
             @if (personagens().length === 0) {
@@ -61,11 +61,11 @@ import { RpgService } from '../../core/services/rpg.service';
             @for (p of personagens(); track p.id) {
               <div class="bg-base-200/50 p-3 rounded-lg border border-base-300 shadow-sm hover:border-secondary/50 transition-colors">
                 <div class="flex justify-between items-start mb-1">
-                  <div class="font-bold text-sm">ID {{ p.id }}: <span class="text-secondary">{{ p.nome }}</span></div>
-                  <div class="badge badge-outline badge-xs opacity-70">{{ p.tipo_personagem || 'Lutador' }}</div>
+                  <div class="font-bold text-sm">ID {{ p.id }}: <span class="text-tertiary">{{ p.nome }}</span></div>
+                  <div class="badge badge-outline badge-sm opacity-70">{{ p.tipo_personagem || 'Lutador' }}</div>
                 </div>
                 
-                <div class="grid grid-cols-2 gap-x-2 gap-y-1 text-[11px] font-mono mt-2">
+                <div class="grid grid-cols-2 gap-x-2 gap-y-1 text-[14px] font-mono mt-2">
                   <div class="text-success">❤️ HP: {{ p.vida }}</div>
                   <div class="text-error">⚔️ ATK: {{ p.ataque }}</div>
                   <div class="text-info">🛡️ DEF: {{ p.defesa }}</div>

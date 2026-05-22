@@ -32,18 +32,18 @@
 
             <!-- Passo 2: Ações de Rede -->
             <div>
-              <h3 class="font-bold text-sm text-secondary mb-3">🌐 Passo 2: Rodadas (Rede)</h3>
+              <h3 class="font-bold text-sm text-tertiary mb-3">🌐 Passo 2: Rodadas (Rede)</h3>
               
               <!-- Tabs -->
               <div class="tabs tabs-boxed mb-4 justify-center bg-base-200">
-                <a class="tab" [ngClass]="{'tab-active bg-secondary text-secondary-content': modo() === 'cliente'}" (click)="modo.set('cliente')">🙋‍♂️ Sou Cliente</a>
+                <a class="tab" [ngClass]="{'tab-active bg-secondary text-tertiary-content': modo() === 'cliente'}" (click)="modo.set('cliente')">🙋‍♂️ Sou Cliente</a>
                 <a class="tab" [ngClass]="{'tab-active bg-error text-error-content': modo() === 'host'}" (click)="modo.set('host')">👑 Sou Host</a>
               </div>
 
               <!-- Painel Cliente -->
               @if (modo() === 'cliente') {
                 <div class="p-4 bg-base-200 rounded-box border border-secondary/30">
-                  <p class="text-xs text-secondary font-bold mb-3">(1º) Envie sua ação em segredo!</p>
+                  <p class="text-xs text-tertiary font-bold mb-3">(1º) Envie sua ação em segredo!</p>
                   <div class="flex flex-col gap-2">
                     <input type="number" [ngModel]="batalhaId()" (ngModelChange)="batalhaId.set($event)" placeholder="ID da Batalha" class="input input-bordered input-sm" />
                     <select [ngModel]="acaoCliente()" (ngModelChange)="acaoCliente.set($event)" class="select select-bordered select-sm">
@@ -105,7 +105,7 @@
                 <!-- Status P2 -->
                 <div>
                   <div class="flex justify-between items-end mb-1">
-                    <span class="font-bold text-secondary">{{ batalha()?.personagem2?.nome || '?' }}</span>
+                    <span class="font-bold text-tertiary">{{ batalha()?.personagem2?.nome || '?' }}</span>
                     <span class="text-xs opacity-70">HP: {{ batalha()?.personagem2?.vida }}</span>
                   </div>
                   <progress class="progress progress-success w-full h-3" 
