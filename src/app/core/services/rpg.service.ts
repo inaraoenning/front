@@ -14,9 +14,15 @@ export interface Personagem {
   nome: string;
   tipo_personagem: string;
   vida: number;
+  forca: number;
+  velocidade: number;
   ataque: number;
   defesa: number;
   magia: number;
+  penitencia: number;
+  vida_maxima: number;
+  sagacidade: number;
+
 }
 
 export interface BatalhaState {
@@ -50,7 +56,7 @@ export class RpgService {
   // ==========================================
   connect(user: string) {
     if (!user.trim()) return;
-    
+
     this.username.set(user);
     this.connectionStatus.set('connecting');
 
@@ -113,7 +119,7 @@ export class RpgService {
 
   sendSystemMessage(texto: string) {
     if (!this.stompClient || this.connectionStatus() !== 'connected') return;
-    
+
     this.stompClient.publish({
       destination: '/app/chat.enviar',
       body: JSON.stringify({
@@ -127,11 +133,12 @@ export class RpgService {
   // ==========================================
   // REST API (AXIOS)
   // ==========================================
-  
+
   async loadPersonagens() {
     try {
       const response = await axios.get(`${this.API_URL}/personagem`);
       this.personagens.set(response.data);
+      console.log(response.data);
     } catch (error) {
       console.error('Erro ao carregar personagens', error);
     }
@@ -143,14 +150,14 @@ export class RpgService {
         idPersonagem1: idP1,
         idPersonagem2: idP2
       });
-      
+
       this.batalhaState.set(response.data);
 
       const p1Nome = response.data.personagem1?.nome ?? '?';
       const p2Nome = response.data.personagem2?.nome ?? '?';
-      
+
       this.sendSystemMessage(`Nova batalha iniciada! ID: ${response.data.id} — ${p1Nome} vs ${p2Nome}`);
-      
+
       return response.data;
     } catch (error) {
       console.error('Erro ao iniciar batalha', error);
@@ -171,7 +178,7 @@ export class RpgService {
 
   async enviarAcaoCliente(idBatalha: number, acao: string) {
     try {
-      const response = await axios.post(`${this.API_URL}/rede/enviar-acao`, {
+      const response = await axios.post(`${this.API_URL}/batalha/enviar-acao`, {
         idBatalha,
         acao
       });
@@ -184,16 +191,16 @@ export class RpgService {
 
   async executarAcaoHost(idBatalha: number, acao: string, urlCliente: string) {
     try {
-      const response = await axios.post(`${this.API_URL}/rede/executar-acao-host`, {
+      const response = await axios.post(`${this.API_URL}/batalha/executar-acao-host`, {
         idBatalha,
         acao,
         urlCliente
       });
-      
+
       // A resposta pode ser um objeto JSON de batalha ou texto se estiver aguardando
       if (typeof response.data === 'object' && response.data.id) {
         this.batalhaState.set(response.data);
-        
+
         // Verifica se terminou
         if (response.data.encerrada) {
           this.sendSystemMessage(`⚔️ BATALHA ENCERRADA! Vencedor: ${response.data.vencedor} 🏆`);
