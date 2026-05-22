@@ -18,6 +18,8 @@
         font-family: 'Inter', sans-serif;
       }
     </style>
+    <!-- Polyfill: sockjs-client usa `global` do Node.js, que não existe no browser -->
+    <script>window.global = window;</script>
   </head>
   <body>
     <app-root></app-root>
