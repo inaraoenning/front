@@ -1,3 +1,6 @@
+// Polyfill para sockjs-client (lib CommonJS que usa `global` do Node.js)
+(window as any).global = window;
+
 import { bootstrapApplication } from '@angular/platform-browser';
 import { appConfig } from './app/app.config';
 import { App } from './app/app';
