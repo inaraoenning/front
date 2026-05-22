@@ -1,0 +1,80 @@
+<div class="divider m-top-6 opacity-50">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke-width="1.5"
+    stroke="currentColor"
+    class="size-6"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      d="m9 9 10.5-3m0 6.553v3.75a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a1.803 1.803 0 1 1-.99-3.467l2.31-.66a2.25 2.25 0 0 0 1.632-2.163Zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a1.803 1.803 0 0 1-.99-3.467l2.31-.66A2.25 2.25 0 0 0 9 15.553Z"
+    />
+  </svg>
+</div>
+
+<div class="w-full bg-base-200 p-4 flex flex-col gap-3">
+  <div class="flex items-center gap-4">
+    <button
+      (click)="togglePlay()"
+      class="btn btn-primary btn-sm border-2 border-neutral shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+    >
+      @if (isPlaying()) {
+        <span class="flex gap-2 items-center">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="size-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M15.75 5.25v13.5m-7.5-13.5v13.5"
+            />
+          </svg>
+
+          <p>Pause</p></span
+        >
+      } @else {
+        <span class="flex gap-2 items-center"
+          ><svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="size-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z"
+            />
+          </svg>
+          <p>Play</p></span
+        >
+      }
+    </button>
+  </div>
+
+  <div class="flex flex-col gap-1 w-full">
+    <input
+      type="range"
+      min="0"
+      [max]="duration()"
+      [value]="currentTime()"
+      (input)="seek($event)"
+      class="range range-xs range-primary border border-neutral"
+    />
+
+    <div class="flex justify-between text-[10px] font-mono opacity-70 px-1">
+      <span>{{ currentTime() * 1000 | date: 'mm:ss' }}</span>
+      <span>{{ duration() * 1000 | date: 'mm:ss' }}</span>
+    </div>
+  </div>
+</div>

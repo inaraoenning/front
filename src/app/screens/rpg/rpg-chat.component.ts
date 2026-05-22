@@ -1,0 +1,128 @@
+import { Component, inject, signal, ElementRef, ViewChild, AfterViewChecked } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RpgService } from '../../core/services/rpg.service';
+
+@Component({
+  selector: 'app-rpg-chat',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  template: `
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- Seção do Chat -->
+      <div class="card bg-base-100 shadow-xl border border-primary/20 lg:col-span-2">
+        <div class="card-body p-4 md:p-6">
+          <h2 class="card-title text-primary mb-2">💬 Chat da Arena</h2>
+          
+          <div #chatContainer class="bg-base-300 h-72 rounded-box p-4 overflow-y-auto mb-4 flex flex-col gap-2 font-sans text-sm">
+            @if (messages().length === 0) {
+              <div class="text-base-content/40 italic text-center mt-auto mb-auto">Nenhuma mensagem ainda...</div>
+            }
+            
+            @for (msg of messages(); track $index) {
+              <div [ngClass]="{
+                'text-success italic': msg.tipo === 'ENTRAR',
+                'text-error italic': msg.tipo === 'SAIR',
+                'text-base-content': msg.tipo === 'CHAT'
+              }">
+                @if (msg.tipo === 'CHAT') {
+                  <span class="font-bold text-primary">{{ msg.remetente }}:</span> <span class="whitespace-pre-wrap">{{ msg.conteudo }}</span>
+                } @else {
+                  {{ msg.conteudo }}
+                }
+              </div>
+            }
+          </div>
+
+          <div class="flex gap-2">
+            <input 
+              type="text" 
+              [ngModel]="messageInput()"
+              (ngModelChange)="messageInput.set($event)"
+              placeholder="Digite sua mensagem e pressione Enter..." 
+              class="input input-bordered input-primary flex-1"
+              (keyup.enter)="sendMessage()"
+            />
+            <button class="btn btn-primary" (click)="sendMessage()" [disabled]="!messageInput().trim()">Enviar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seção de Personagens -->
+      <div class="card bg-base-100 shadow-xl border border-secondary/20">
+        <div class="card-body p-4 md:p-6 flex flex-col h-full">
+          <h2 class="card-title text-secondary mb-2">👥 Heróis Disponíveis</h2>
+          
+          <div class="flex-1 overflow-y-auto pr-2 flex flex-col gap-3 min-h-[250px] max-h-[350px]">
+            @if (personagens().length === 0) {
+              <div class="text-sm text-base-content/50 italic text-center mt-10">Buscando heróis nos reinos...</div>
+            }
+            @for (p of personagens(); track p.id) {
+              <div class="bg-base-200/50 p-3 rounded-lg border border-base-300 shadow-sm hover:border-secondary/50 transition-colors">
+                <div class="flex justify-between items-start mb-1">
+                  <div class="font-bold text-sm">ID {{ p.id }}: <span class="text-secondary">{{ p.nome }}</span></div>
+                  <div class="badge badge-outline badge-xs opacity-70">{{ p.tipo_personagem || 'Lutador' }}</div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-x-2 gap-y-1 text-[11px] font-mono mt-2">
+                  <div class="text-success">❤️ HP: {{ p.vida }}</div>
+                  <div class="text-error">⚔️ ATK: {{ p.ataque }}</div>
+                  <div class="text-info">🛡️ DEF: {{ p.defesa }}</div>
+                  <div class="text-warning">✨ MAG: {{ p.magia }}</div>
+                </div>
+              </div>
+            }
+          </div>
+          
+          <button class="btn btn-outline btn-secondary btn-sm mt-4 w-full" (click)="loadPersonagens()">
+            Atualizar Lista
+          </button>
+        </div>
+      </div>
+
+    </div>
+  `
+})
+export class RpgChatComponent implements AfterViewChecked {
+  rpgService = inject(RpgService);
+  
+  @ViewChild('chatContainer') private chatContainer!: ElementRef;
+  
+  messageInput = signal('');
+  
+  get messages() {
+    return this.rpgService.chatMessages;
+  }
+  
+  get personagens() {
+    return this.rpgService.personagens;
+  }
+
+  ngOnInit() {
+    this.loadPersonagens();
+  }
+
+  ngAfterViewChecked() {
+    this.scrollToBottom();
+  }
+
+  scrollToBottom(): void {
+    try {
+      if (this.chatContainer) {
+        this.chatContainer.nativeElement.scrollTop = this.chatContainer.nativeElement.scrollHeight;
+      }
+    } catch(err) { }
+  }
+
+  loadPersonagens() {
+    this.rpgService.loadPersonagens();
+  }
+
+  sendMessage() {
+    if (this.messageInput().trim()) {
+      this.rpgService.sendMessage(this.messageInput().trim());
+      this.messageInput.set('');
+    }
+  }
+}
