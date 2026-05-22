@@ -1,0 +1,137 @@
+<div class="card bg-base-100 shadow-xl border border-error/20">
+      <div class="card-body p-4 md:p-6">
+        
+        <h2 class="card-title text-error mb-4">⚔️ Campo de Batalha</h2>
+        
+        <!-- Alertas / Regras -->
+        <div class="alert alert-success bg-success/10 text-success-content text-sm mb-6 border-success/30">
+          <div>
+            <span class="font-bold">Regras:</span> O Host cria a batalha com dois IDs. O Cliente envia sua ação em segredo. Depois, o Host roda o turno!
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          
+          <!-- Lado Esquerdo: Controles -->
+          <div class="flex flex-col gap-6">
+            
+            <!-- Passo 1: Host Cria Batalha -->
+            <div class="p-4 bg-base-200 rounded-box border border-base-300">
+              <h3 class="font-bold text-sm text-primary mb-3">🛠️ Passo 1: O Host Cria a Batalha</h3>
+              <div class="flex flex-wrap gap-2">
+                <input type="number" [ngModel]="idP1()" (ngModelChange)="idP1.set($event)" placeholder="ID P1 (Host)" class="input input-bordered input-sm flex-1 min-w-[100px]" />
+                <input type="number" [ngModel]="idP2()" (ngModelChange)="idP2.set($event)" placeholder="ID P2 (Rival)" class="input input-bordered input-sm flex-1 min-w-[100px]" />
+                <button class="btn btn-primary btn-sm" (click)="iniciarBatalha()">Iniciar!</button>
+              </div>
+              <button class="btn btn-outline btn-sm w-full mt-3" (click)="consultarBatalha()">
+                🔍 Sincronizar Batalha (Pelo ID abaixo)
+              </button>
+            </div>
+
+            <div class="divider my-0"></div>
+
+            <!-- Passo 2: Ações de Rede -->
+            <div>
+              <h3 class="font-bold text-sm text-secondary mb-3">🌐 Passo 2: Rodadas (Rede)</h3>
+              
+              <!-- Tabs -->
+              <div class="tabs tabs-boxed mb-4 justify-center bg-base-200">
+                <a class="tab" [ngClass]="{'tab-active bg-secondary text-secondary-content': modo() === 'cliente'}" (click)="modo.set('cliente')">🙋‍♂️ Sou Cliente</a>
+                <a class="tab" [ngClass]="{'tab-active bg-error text-error-content': modo() === 'host'}" (click)="modo.set('host')">👑 Sou Host</a>
+              </div>
+
+              <!-- Painel Cliente -->
+              @if (modo() === 'cliente') {
+                <div class="p-4 bg-base-200 rounded-box border border-secondary/30">
+                  <p class="text-xs text-secondary font-bold mb-3">(1º) Envie sua ação em segredo!</p>
+                  <div class="flex flex-col gap-2">
+                    <input type="number" [ngModel]="batalhaId()" (ngModelChange)="batalhaId.set($event)" placeholder="ID da Batalha" class="input input-bordered input-sm" />
+                    <select [ngModel]="acaoCliente()" (ngModelChange)="acaoCliente.set($event)" class="select select-bordered select-sm">
+                      <option value="ATACAR">Atacar 🗡️</option>
+                      <option value="DEFENDER">Defender 🛡️</option>
+                      <option value="PODER">Poder 🌟</option>
+                    </select>
+                    <button class="btn btn-secondary btn-sm" (click)="enviarAcaoCliente()">Enviar Ação</button>
+                  </div>
+                </div>
+              }
+
+              <!-- Painel Host -->
+              @if (modo() === 'host') {
+                <div class="p-4 bg-base-200 rounded-box border border-error/30">
+                  <p class="text-xs text-error font-bold mb-3">(2º) Rode o combate após o cliente jogar!</p>
+                  <div class="flex flex-col gap-2">
+                    <input type="number" [ngModel]="batalhaId()" (ngModelChange)="batalhaId.set($event)" placeholder="ID da Batalha" class="input input-bordered input-sm" />
+                    <select [ngModel]="acaoHost()" (ngModelChange)="acaoHost.set($event)" class="select select-bordered select-sm">
+                      <option value="ATACAR">Atacar 🗡️</option>
+                      <option value="DEFENDER">Defender 🛡️</option>
+                      <option value="PODER">Poder 🌟</option>
+                    </select>
+                    <input type="text" [ngModel]="urlCliente()" (ngModelChange)="urlCliente.set($event)" readonly class="input input-bordered input-sm opacity-60 text-xs" />
+                    <button class="btn btn-error btn-sm text-error-content" (click)="executarTurnoHost()">Rodar Turno!</button>
+                  </div>
+                </div>
+              }
+            </div>
+
+          </div>
+
+          <!-- Lado Direito: Placar / Resultado -->
+          <div class="bg-base-300 rounded-box p-4 border border-base-content/10 flex flex-col">
+            <h3 class="font-bold text-center mb-4 uppercase tracking-widest text-sm text-base-content/70">Visor da Batalha</h3>
+            
+            @if (!batalha()) {
+              <div class="flex-1 flex items-center justify-center text-base-content/30 italic text-sm">
+                Nenhuma batalha carregada.
+              </div>
+            } @else {
+              <div class="flex flex-col gap-4">
+                <!-- Status P1 -->
+                <div>
+                  <div class="flex justify-between items-end mb-1">
+                    <span class="font-bold text-primary">{{ batalha()?.personagem1?.nome || '?' }}</span>
+                    <span class="text-xs opacity-70">HP: {{ batalha()?.personagem1?.vida }}</span>
+                  </div>
+                  <progress class="progress progress-success w-full h-3" 
+                            [value]="batalha()?.personagem1?.vida" 
+                            [max]="100"
+                            [ngClass]="{'progress-error': (batalha()?.personagem1?.vida ?? 0) < 30}">
+                  </progress>
+                </div>
+
+                <!-- VS -->
+                <div class="text-center text-xs font-bold opacity-50 py-1">VS</div>
+
+                <!-- Status P2 -->
+                <div>
+                  <div class="flex justify-between items-end mb-1">
+                    <span class="font-bold text-secondary">{{ batalha()?.personagem2?.nome || '?' }}</span>
+                    <span class="text-xs opacity-70">HP: {{ batalha()?.personagem2?.vida }}</span>
+                  </div>
+                  <progress class="progress progress-success w-full h-3" 
+                            [value]="batalha()?.personagem2?.vida" 
+                            [max]="100"
+                            [ngClass]="{'progress-error': (batalha()?.personagem2?.vida ?? 0) < 30}">
+                  </progress>
+                </div>
+
+                @if (batalha()?.encerrada) {
+                  <div class="mt-4 text-center">
+                    <div class="text-3xl mb-1">🏆</div>
+                    <div class="text-warning font-bold text-lg">VITÓRIA: {{ batalha()?.vencedor }}!</div>
+                  </div>
+                }
+
+                <!-- Log Visual -->
+                @if (batalha()?.log || batalha()?.logDescritivo) {
+                  <div class="mt-4 p-3 bg-base-100 rounded border border-base-200 text-xs font-mono whitespace-pre-wrap h-32 overflow-y-auto text-base-content/80">
+                    {{ batalha()?.log || batalha()?.logDescritivo }}
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+        </div>
+      </div>
+    </div>
