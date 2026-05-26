@@ -60,6 +60,7 @@
           </div>
         }
         @for (p of personagens(); track p.id) {
+          <div class="flex justify-end mt-4"></div>
           <div
             class="bg-base-200/50 p-3 rounded-lg border border-base-300 shadow-sm hover:border-secondary/50 transition-colors"
           >
@@ -72,34 +73,38 @@
               </div>
             </div>
 
-            @if(p.vida > 0){
- <div class="grid grid-cols-2 gap-x-2 gap-y-1 text-[14px] font-mono mt-2">
+            @if (p.vida > 0) {
+              <div class="grid grid-cols-2 gap-x-2 gap-y-1 text-[14px] font-mono mt-2">
                 <div class="text-success">❤️ HP: {{ p.vida }}</div>
                 <div class="text-error">💪🏻 FORÇA: {{ p.forca }}</div>
                 <div class="text-info">🛡️ DEF: {{ p.defesa }}</div>
                 @if (p.tipo_personagem.includes('MAGO')) {
                   <div class="text-warning">✨ MAG: {{ p.magia }}</div>
                 }
-                 @if (p.tipo_personagem.includes('SACERDOTE')) {
+                @if (p.tipo_personagem.includes('SACERDOTE')) {
                   <div class="text-warning">🔵 MANA: {{ p.penitencia }}</div>
                 }
-                   @if (p.tipo_personagem.includes('LADINO')) {
+                @if (p.tipo_personagem.includes('LADINO')) {
                   <div class="text-warning">🏃🏻‍➡️ VELOCIDADE: {{ p.sagacidade }}</div>
                 }
               </div>
             } @else {
               <div class="text-center">
-                <span class="text-error">{{p.nome }} morreu!</span>
+                <span class="text-error">{{ p.nome }} morreu!</span>
               </div>
             }
-            
-            </div>
+          </div>
         }
       </div>
 
-      <button class="btn btn-outline btn-secondary btn-sm mt-4 w-full" (click)="loadPersonagens()">
-        Atualizar Lista
-      </button>
+      <div class="flex justify-end mt-4 gap-2">
+        <button class="btn btn-outline btn-secondary btn-sm" (click)="loadPersonagens()">
+          Atualizar Lista
+        </button>
+        <button class="btn btn-outline btn-secondary btn-sm" (click)="resetPersonagens()">
+          Resetar Personagens
+        </button>
+      </div>
     </div>
   </div>
 </div>

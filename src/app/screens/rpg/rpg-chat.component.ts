@@ -11,15 +11,15 @@ import { RpgService } from '../../core/services/rpg.service';
 })
 export class RpgChatComponent implements AfterViewChecked {
   rpgService = inject(RpgService);
-  
+
   @ViewChild('chatContainer') private chatContainer!: ElementRef;
-  
+
   messageInput = signal('');
-  
+
   get messages() {
     return this.rpgService.chatMessages;
   }
-  
+
   get personagens() {
     return this.rpgService.personagens;
   }
@@ -37,11 +37,15 @@ export class RpgChatComponent implements AfterViewChecked {
       if (this.chatContainer) {
         this.chatContainer.nativeElement.scrollTop = this.chatContainer.nativeElement.scrollHeight;
       }
-    } catch(err) { }
+    } catch (err) {}
   }
 
   loadPersonagens() {
     this.rpgService.loadPersonagens();
+  }
+
+  resetPersonagens() {
+    this.rpgService.resetPersonagens();
   }
 
   sendMessage() {

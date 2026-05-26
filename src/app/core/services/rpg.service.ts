@@ -22,7 +22,6 @@ export interface Personagem {
   penitencia: number;
   vida_maxima: number;
   sagacidade: number;
-
 }
 
 export interface BatalhaState {
@@ -36,7 +35,7 @@ export interface BatalhaState {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class RpgService {
   private readonly API_URL = 'https://desafio-final-rpg-kotlin.onrender.com';
@@ -69,7 +68,7 @@ export class RpgService {
         this.stompClient?.subscribe('/topic/mensagens', (mensagem: IMessage) => {
           if (mensagem.body) {
             const dados: ChatMessage = JSON.parse(mensagem.body);
-            this.chatMessages.update(msgs => [...msgs, dados]);
+            this.chatMessages.update((msgs) => [...msgs, dados]);
           }
         });
 
@@ -79,8 +78,8 @@ export class RpgService {
           body: JSON.stringify({
             remetente: this.username(),
             conteudo: '',
-            tipo: 'ENTRAR'
-          })
+            tipo: 'ENTRAR',
+          }),
         });
       },
       onWebSocketError: (error) => {
@@ -90,7 +89,7 @@ export class RpgService {
       onStompError: (frame) => {
         console.error('Erro STOMP', frame.headers['message']);
         this.connectionStatus.set('disconnected');
-      }
+      },
     });
 
     this.stompClient.activate();
@@ -112,8 +111,8 @@ export class RpgService {
       body: JSON.stringify({
         remetente: this.username(),
         conteudo: texto,
-        tipo: 'CHAT'
-      })
+        tipo: 'CHAT',
+      }),
     });
   }
 
@@ -125,8 +124,8 @@ export class RpgService {
       body: JSON.stringify({
         remetente: '🔔 Sistema',
         conteudo: texto,
-        tipo: 'CHAT'
-      })
+        tipo: 'CHAT',
+      }),
     });
   }
 
@@ -144,11 +143,21 @@ export class RpgService {
     }
   }
 
+  async resetPersonagens() {
+    try {
+      const response = await axios.put(`${this.API_URL}/personagem/ressucitar`);
+      this.personagens.set(response.data);
+      console.log(response.data);
+    } catch (error) {
+      console.error('Erro ao resetar personagens', error);
+    }
+  }
+
   async iniciarBatalha(idP1: number, idP2: number) {
     try {
       const response = await axios.post(`${this.API_URL}/batalha/iniciar`, {
         idPersonagem1: idP1,
-        idPersonagem2: idP2
+        idPersonagem2: idP2,
       });
 
       this.batalhaState.set(response.data);
@@ -156,7 +165,9 @@ export class RpgService {
       const p1Nome = response.data.personagem1?.nome ?? '?';
       const p2Nome = response.data.personagem2?.nome ?? '?';
 
-      this.sendSystemMessage(`Nova batalha iniciada! ID: ${response.data.id} — ${p1Nome} vs ${p2Nome}`);
+      this.sendSystemMessage(
+        `Nova batalha iniciada! ID: ${response.data.id} — ${p1Nome} vs ${p2Nome}`,
+      );
 
       return response.data;
     } catch (error) {
@@ -180,7 +191,7 @@ export class RpgService {
     try {
       const response = await axios.post(`${this.API_URL}/batalha/enviar-acao`, {
         idBatalha,
-        acao
+        acao,
       });
       return response.data; // Retorna texto ou log
     } catch (error) {
@@ -194,7 +205,7 @@ export class RpgService {
       const response = await axios.post(`${this.API_URL}/batalha/executar-acao-host`, {
         idBatalha,
         acao,
-        urlCliente
+        urlCliente,
       });
 
       // A resposta pode ser um objeto JSON de batalha ou texto se estiver aguardando
